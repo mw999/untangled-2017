@@ -136,7 +136,6 @@ class Player():
         else:
             self.noclip = False
 
-
         if(self.inputCool == 0):
             if(keys[pygame.K_LSHIFT]):
                 if keys[pygame.K_w]:
