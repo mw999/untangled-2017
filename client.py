@@ -157,6 +157,7 @@ class GameClient():
                                 cast = True
                                 me.attack(Action.SPELL, last_direction,(me.x,me.y))
                             elif event.key == pygame.locals.K_SPACE:
+                                cast = True
                                 me.attack(Action.SWIPE, last_direction,(me.x,me.y))
                             pygame.event.clear(pygame.locals.KEYDOWN)
 
