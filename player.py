@@ -138,16 +138,20 @@ class Player():
 
         tmp_x = self.x
         tmp_y = self.y
+        
+        haxBonus = 0
+        if self.hax:
+            haxBonus = 10
 
         if direction == Movement.UP:
-            tmp_y -= self.step
+            tmp_y -= self.step + haxBonus
         elif direction == Movement.DOWN:
-            tmp_y += self.step
+            tmp_y += self.step + haxBonus
 
         if direction == Movement.RIGHT:
-            tmp_x += self.step
+            tmp_x += self.step + haxBonus
         elif direction == Movement.LEFT:
-            tmp_x -= self.step
+            tmp_x -= self.step + haxBonus
 
         if not self.map.level.can_move_to(tmp_x, tmp_y,  self.hax):
             return
