@@ -99,7 +99,7 @@ class GameClient():
         clock = pygame.time.Clock()
         tickspeed = 60
         last_direction = None
-        toMove = False # Flag for when player moves - reduces network stress
+        toMove = True # Flag for when player moves - reduces network stress
         cast = False # Flag for when player casts spell.
         me = self.players.me
 

@@ -209,7 +209,7 @@ class Spell():
         self.player = player
         self.size = size
         self.colour = colour
-        self.life = life
+        self.life = 100
         self.maxLife = life
         if position == None:
             # spawn at player - additional maths centres the spell
