@@ -240,6 +240,7 @@ class GameClient():
                                     network_spell_caster = self.players.get(event.peer_uuid)
                                     network_spell_caster.cast_spells.append(Spell(network_spell_caster, (0, 0)))
                                     network_spell_caster.cast_spells[-1].set_properties(SpellProperties(**new_spell_properties))
+
                                 if network_player:
                                     network_player.set_position(Position(**new_position))
 
