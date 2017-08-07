@@ -44,6 +44,7 @@ class Player():
         self.initial_position = (0, 0)
         self.animation_ticker = 0
         self.set_position(self.initial_position)
+        self.hax = False
 
     def __raiseNoPosition(self):
         raise PlayerException({"message": "Player does not have a position set", "player": self})
@@ -127,7 +128,10 @@ class Player():
         # create collision rectangle
         self.rect = sprite.get_rect()
         self.rect.topleft = centre
-
+    
+    def set_hax(self):
+        self.hax = not self.hax
+    
     def move(self, direction):
         if not self.ready:
             self.__raiseNoPosition()
@@ -145,7 +149,7 @@ class Player():
         elif direction == Movement.LEFT:
             tmp_x -= self.step
 
-        if not self.map.level.can_move_to(tmp_x, tmp_y):
+        if not self.map.level.can_move_to(tmp_x, tmp_y,  self.hax):
             return
 
         self.set_position(Position(tmp_x, tmp_y))

@@ -42,6 +42,7 @@ class GameState(Enum):
     MUTE = 5
 
 class GameClient():
+    hax = False
     game_state = GameState.MENU
 
     def __init__(self):
@@ -95,6 +96,7 @@ class GameClient():
                 pygame.key.set_repeat(0, 0)
 
     def run(self):
+        global hax
         running = True
         clock = pygame.time.Clock()
         tickspeed = 60
@@ -163,6 +165,8 @@ class GameClient():
                                     me.attack(Action.SPELL, Movement.DOWN)
                                 else:
                                     me.attack(Action.SPELL, Movement.RIGHT)
+                            elif event.key == pygame.locals.K_SPACE:
+                                me.set_hax()
                             pygame.event.clear(pygame.locals.KEYDOWN)
 
                     # https://stackoverflow.com/a/15596758/3954432
