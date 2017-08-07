@@ -149,7 +149,7 @@ class Player():
                 tmp_y -= self.step
             elif direction == Movement.DOWN:
                 tmp_y += self.step
-	    if direction == Movement.RIGHT:
+            if direction == Movement.RIGHT:
                 tmp_x += self.step
             elif direction == Movement.LEFT:
                 tmp_x -= self.step

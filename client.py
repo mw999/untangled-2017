@@ -21,6 +21,7 @@ from screen import MainMenu
 from level import ProceduralLevel
 from tile import Tileset
 from music import LevelMusic
+from powerups import *
 
 white = (255,255,255)
 black = (0,0,0)
@@ -43,7 +44,7 @@ class GameState(Enum):
 
 class GameClient():
     game_state = GameState.MENU
-
+    poweruptest = None
     def __init__(self):
         self.network = Network()
         self.setup_pygame()
@@ -83,6 +84,8 @@ class GameClient():
             Tileset(level_tileset_path, (16, 16), (32, 32)),
             LevelMusic('assets/music/song.mp3')
         )
+        
+        self.poweruptest = Powerup(0, Rect(10,  10,  64,  64), (255, 0, 0), self.screen,  self.map)
         self.map.music.load_music()
 
     def set_state(self, new_state):
@@ -212,7 +215,7 @@ class GameClient():
                     me.render()
                     for spell in me.cast_spells:
                         spell.render()
-
+                    self.poweruptest.draw()
                     self.players.set(self.network.node.peers())
                     # check network
                     events = self.network.get_events()
