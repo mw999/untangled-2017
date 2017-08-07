@@ -155,21 +155,14 @@ class GameClient():
                                 last_direction = Movement.RIGHT
                             elif event.key == pygame.locals.K_RETURN:
                                 cast = True
-                                if last_direction == Movement.LEFT:
-                                    me.attack(Action.SPELL, Movement.LEFT)
-                                elif last_direction == Movement.UP:
-                                    me.attack(Action.SPELL, Movement.UP)
-                                elif last_direction == Movement.DOWN:
-                                    me.attack(Action.SPELL, Movement.DOWN)
-                                else:
-                                    me.attack(Action.SPELL, Movement.RIGHT)
+                                me.attack(Action.SPELL, last_direction)
                             pygame.event.clear(pygame.locals.KEYDOWN)
 
                     # https://stackoverflow.com/a/15596758/3954432
                     # Handle controller input by setting flags (move, neutral)
                     # and using timers (delay, pressed).
                     # Move if pressed timer is greater than delay.
-                    if(pygame.joystick.get_count() > 0):
+                    if(pygame.joystick.get_count() > 0 and me.name != "windowstester"):
                         joystick = pygame.joystick.Joystick(0)
                         move = False
                         delay = 100
@@ -206,6 +199,17 @@ class GameClient():
                             if x_axis < -0.5:
                                 me.move(Movement.LEFT)
                                 last_direction = Movement.LEFT
+                        # A
+                        if joystick.get_button(1):
+                            cast = True
+                            if last_direction == Movement.LEFT:
+                                me.attack(Action.SPELL, Movement.LEFT)
+                            elif last_direction == Movement.UP:
+                                me.attack(Action.SPELL, Movement.UP)
+                            elif last_direction == Movement.DOWN:
+                                me.attack(Action.SPELL, Movement.DOWN)
+                            else:
+                                me.attack(Action.SPELL, Movement.RIGHT)
                         last_update = pygame.time.get_ticks()
 
                     self.map.render()
