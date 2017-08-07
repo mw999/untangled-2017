@@ -44,6 +44,8 @@ class Player():
         self.initial_position = (0, 0)
         self.animation_ticker = 0
         self.set_position(self.initial_position)
+        self.noclip = False
+        self.inputCool = 0
 
     def __raiseNoPosition(self):
         raise PlayerException({"message": "Player does not have a position set", "player": self})
@@ -128,6 +130,26 @@ class Player():
         self.rect = sprite.get_rect()
         self.rect.topleft = centre
 
+        keys = pygame.key.get_pressed()
+        if(keys[pygame.K_LCTRL]):
+            self.noclip = True
+        else:
+            self.noclip = False
+
+
+        if(self.inputCool == 0):
+            if(keys[pygame.K_LSHIFT]):
+                if keys[pygame.K_w]:
+                    self.step += 1
+                    self.inputCool = 4
+                    print("Speed set to:",self.step)
+                if keys[pygame.K_s]:
+                    self.step -= 1
+                    self.inputCool = 4
+                    print("Speed set to:",self.step)
+        else:
+            self.inputCool -= 1
+
     def move(self, direction):
         if not self.ready:
             self.__raiseNoPosition()
@@ -145,7 +167,7 @@ class Player():
         elif direction == Movement.LEFT:
             tmp_x -= self.step
 
-        if not self.map.level.can_move_to(tmp_x, tmp_y):
+        if not self.map.level.can_move_to(tmp_x, tmp_y) and not self.noclip:
             return
 
         self.set_position(Position(tmp_x, tmp_y))
@@ -174,7 +196,7 @@ class Player():
                 self.cast_spells[1:]
             self.cast_spells.append(spell)
         elif action == Action.SWIPE:
-            for i in range(0,15):
+            for i in range(0,30):
             	self.attack(Action.SPELL,(math.sin(i),math.cos(i)),position)
             return
 
@@ -183,7 +205,7 @@ class Player():
         return
 
 class Spell():
-    def __init__(self, player, velocity, position=None, size=(0.25, 0.25), colour=(0,0,0), life=200):
+    def __init__(self, player, velocity, position=None, size=(0.25, 0.25), colour=(0,0,0), life=20):
         self.player = player
         self.size = size
         self.colour = colour
@@ -195,8 +217,8 @@ class Spell():
             self.y = self.player.y + 0.5 - (size[1] / 2)
         else:
             self.set_position(position)
-
-        self.set_velocity(velocity)
+        if(velocity != None):
+            self.set_velocity(velocity)
 
     def render(self):
         self.colour = (random.randrange(255),random.randrange(255),random.randrange(255))
@@ -224,6 +246,9 @@ class Spell():
 
     def destroy(self):
         self.player.remove_spell(self)
+        if(random.randrange(30) == 1 and len(self.player.cast_spells) < 300):
+            self.player.attack(Action.SWIPE,Movement.UP,self.get_position())
+        del(self)
 
     def get_position(self):
         return (self.x,self.y)
