@@ -163,6 +163,9 @@ class GameClient():
                             elif event.key == pygame.locals.K_RETURN:
                                 cast = True
                                 me.attack(Action.SPELL, last_direction)
+                            elif event.key == pygame.locals.K_SPACE:
+                                cast = True
+                                me.attack(Action.SWIPE, last_direction)
                             pygame.event.clear(pygame.locals.KEYDOWN)
 
                     # https://stackoverflow.com/a/15596758/3954432

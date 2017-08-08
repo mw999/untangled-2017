@@ -40,6 +40,8 @@ class Player():
         self.name = ''
         self.x, self.y = (0, 0)
         self.animation_ticker = 0
+        self.noclip = False
+        self.inputCool = 0
 
         self.initial_position = (0, 0)
         found = False
@@ -137,6 +139,26 @@ class Player():
         self.rect = sprite.get_rect()
         self.rect.topleft = centre
 
+        keys = pygame.key.get_pressed()
+        if(keys[pygame.K_LCTRL]):
+            self.noclip = True
+        else:
+            self.noclip = False
+
+
+        if(self.inputCool == 0):
+            if(keys[pygame.K_LSHIFT]):
+                if keys[pygame.K_w]:
+                    self.step += 1
+                    self.inputCool = 4
+                    print("Speed set to:",self.step)
+                if keys[pygame.K_s]:
+                    self.step -= 1
+                    self.inputCool = 4
+                    print("Speed set to:",self.step)
+        else:
+            self.inputCool -= 1
+
     def move(self, direction):
         if not self.ready:
             self.__raiseNoPosition()
@@ -154,7 +176,7 @@ class Player():
         elif direction == Movement.LEFT:
             tmp_x -= self.step
 
-        if not self.map.level.can_move_to(tmp_x, tmp_y):
+        if not self.map.level.can_move_to(tmp_x, tmp_y) and not self.noclip:
             return
 
         self.set_position(Position(tmp_x, tmp_y))
@@ -183,7 +205,8 @@ class Player():
                 self.cast_spells[1:]
             self.cast_spells.append(spell)
         elif action == Action.SWIPE:
-            #TODO
+            for i in range(0,30):
+                self.attack(Action.SPELL,(math.sin(i),math.cos(i)),position)
             return
 
     def remove_spell(self,spell):
