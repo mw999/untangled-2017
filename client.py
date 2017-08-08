@@ -9,6 +9,7 @@ import zmq
 import pdb
 import bson
 import uuid
+import webbrowser
 from pyre import Pyre, pyre_event
 from pyre import zhelper
 from collections import namedtuple
@@ -54,6 +55,12 @@ class GameClient():
         self.flags = [Flag(self.screen, self.map, "red"), Flag(self.screen, self.map, "blue")]
         self.map.set_centre_player(self.players.me)
         self.menu = MainMenu(self.screen, self.players)
+        self.pressed_directions = {
+            "LEFT": 0, 
+            "RIGHT": 0, 
+            "UP": 0, 
+            "DOWN": 0 
+        }
 
     def setup_pygame(self):
         # Initialise screen/display
@@ -93,7 +100,8 @@ class GameClient():
             self.game_state = new_state
 
             if(self.game_state.value == GameState.PLAY.value):
-                pygame.key.set_repeat(50, 50)
+                #pygame.key.set_repeat(50, 50)  
+                pass 
             else:
                 pygame.key.set_repeat(0, 0)
 
@@ -126,7 +134,7 @@ class GameClient():
                     running = False
                     break
                 elif(self.game_state.value == GameState.HELP.value):
-                    print("Help menu option pressed")
+                    webbrowser.open_new_tab("https://github.com/neontribe/untangled-2017/wiki")
                     self.game_state = GameState.MENU
                 elif(self.game_state.value == GameState.MUTE.value):
                     if me.mute == "False":
@@ -137,6 +145,7 @@ class GameClient():
                         LevelMusic.play_music_repeat()
                     self.game_state = GameState.MENU
                 else:
+                    
                     # handle inputs
                     if last_direction == None:
                         last_direction = Movement.DOWN
@@ -146,24 +155,16 @@ class GameClient():
                             break
                         elif event.type == pygame.locals.KEYDOWN and event.key == pygame.locals.K_ESCAPE:
                             self.set_state(GameState.MENU)
-
                         elif event.type == pygame.locals.KEYDOWN:
+                            
                             if event.key == pygame.locals.K_UP or event.key == pygame.locals.K_w:
-                                me.move(Movement.UP)
-                                last_direction = Movement.UP
-                                toMove = True
+                                self.pressed_directions["UP"] = Movement.UP
                             elif event.key == pygame.locals.K_DOWN or event.key == pygame.locals.K_s:
-                                me.move(Movement.DOWN)
-                                last_direction = Movement.DOWN
-                                toMove = True
+                                self.pressed_directions["DOWN"] = Movement.DOWN
                             elif event.key == pygame.locals.K_LEFT or event.key == pygame.locals.K_a:
-                                me.move(Movement.LEFT)
-                                last_direction = Movement.LEFT
-                                toMove = True
+                                self.pressed_directions["LEFT"] = Movement.LEFT
                             elif event.key == pygame.locals.K_RIGHT or event.key == pygame.locals.K_d:
-                                me.move(Movement.RIGHT)
-                                last_direction = Movement.RIGHT
-                                toMove = True
+                                self.pressed_directions["RIGHT"] = Movement.RIGHT
                             elif event.key == pygame.locals.K_RETURN or event.key == pygame.locals.K_SPACE :
                                 cast = True
                                 me.attack(Action.SPELL, last_direction)
@@ -174,11 +175,18 @@ class GameClient():
                                 me.can_step_ability = False
                                
                             pygame.event.clear(pygame.locals.KEYDOWN)
-                            
+                        else:
+                            self.pressed_directions = {
+                                "LEFT": 0, 
+                                "RIGHT": 0, 
+                                "UP": 0, 
+                                "DOWN": 0 
+                            }    
                         if time.time() - me.steptime >30:
                             me.can_step_ability = True
                         elif time.time() - me.steptime >3:
                             me.step = 1
+
                     if pygame.mouse.get_pressed()[0]:
                         cast = True
                         me.attack(Action.SPELL, last_direction)
@@ -192,49 +200,62 @@ class GameClient():
 
                     if(pygame.joystick.get_count() > 0 and not me.name.startswith("windows") and not toMove):
                         joystick = pygame.joystick.Joystick(0)
-                        move = False
-                        delay = 100
-                        neutral = True
-                        pressed = 0
-                        last_update = pygame.time.get_ticks()
+                        
                         y_axis = joystick.get_axis(1)
                         x_axis = joystick.get_axis(0)
-
-                        if y_axis == 0 and x_axis == 0: #Indicates no motion.
-                            neutral = True
-                            pressed = 0
-                        else:
-                            if neutral:
-                                move = True
-                                neutral = False
-                            else:
-                                pressed += pygame.time.get_ticks() - last_update
-                        if pressed > delay:
-                            move = True
-                            pressed -= delay
-                        if move:
-                            # up/down
-                            if y_axis > 0.5:
-                                me.move(Movement.DOWN)
-                                last_direction = Movement.DOWN
-                                toMove = True
-                            if y_axis < -0.5:
-                                me.move(Movement.UP)
-                                last_direction = Movement.UP
-                                toMove = True
-                            # left/right
-                            if x_axis > 0.5:
-                                me.move(Movement.RIGHT)
-                                last_direction = Movement.RIGHT
-                                toMove = True
-                            if x_axis < -0.5:
-                                me.move(Movement.LEFT)
-                                last_direction = Movement.LEFT
-                                toMove = True
                         # A
                         if joystick.get_button(1) or joystick.get_button(0):
                             cast = True
                             me.attack(Action.SPELL, last_direction)
+                    x_axis = 0
+                    y_axis = 0
+                    if self.pressed_directions["UP"] == Movement.UP:
+                        y_axis = 1
+                    elif self.pressed_directions["DOWN"] == Movement.DOWN:
+                        y_axis = -1
+                    
+                    if self.pressed_directions["LEFT"] == Movement.LEFT:
+                        x_axis = 1
+                    elif self.pressed_directions["RIGHT"] == Movement.RIGHT:
+                        x_axis = -1
+                    
+                    move = False
+                    delay = 100
+                    neutral = True
+                    pressed = 0 
+                    last_update = pygame.time.get_ticks()
+                    if y_axis == 0 and x_axis == 0: #Indicates no motion.
+                        neutral = True
+                        pressed = 0
+                    else:
+                        if neutral:
+                            move = True
+                            neutral = False
+                        else:
+                            pressed += pygame.time.get_ticks() - last_update
+                    if pressed > delay:
+                        move = True
+                        pressed -= delay
+                    if move:
+                        # up/down
+                        if y_axis > 0.5:
+                            me.move(Movement.DOWN)
+                            last_direction = Movement.DOWN
+                            toMove = True
+                        if y_axis < -0.5:
+                            me.move(Movement.UP)
+                            last_direction = Movement.UP
+                            toMove = True
+                        # left/right
+                        if x_axis > 0.5:
+                            me.move(Movement.RIGHT)
+                            last_direction = Movement.RIGHT
+                            toMove = True
+                        if x_axis < -0.5:
+                            me.move(Movement.LEFT)
+                            last_direction = Movement.LEFT
+                            toMove = True
+                        
                         last_update = pygame.time.get_ticks()
 
                     self.map.render()
