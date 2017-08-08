@@ -5,7 +5,7 @@ git checkout master
 git pull
 echo "#!/bin/bash" > adinstall.sh
 echo "clear" >> adinstall.sh
-echo "About to update... Hold on!" >> adinstall.sh
+echo "echo 'About to update... Hold on!'" >> adinstall.sh
 echo "git pull" >> adinstall.sh
 echo "cp player_example player_save" >> adinstall.sh
 echo "sh adinstall.sh" >> adinstall.sh
