@@ -232,11 +232,20 @@ class GameClient():
                                 last_direction = Movement.LEFT
                                 toMove = True
                         # A
-                        if joystick.get_button(1) or joystick.get_button(0):
+                        if joystick.get_button(1) or joystick.get_button(0) or joystick.get_button(5) or joystick.get_button(7):
                             cast = True
                             me.attack(Action.SPELL, last_direction)
+                        if joystick.get_button(3):
+                            me.step = 2
+                            me.steptime = time.time()
+                            me.can_step_ability = False
                         last_update = pygame.time.get_ticks()
-
+                        
+                        if time.time() - me.steptime >30:
+                            me.can_step_ability = True
+                        elif time.time() - me.steptime >3:
+                            me.step = 1
+                      
                     self.map.render()
                     me.render()
                     for flag in flags:
