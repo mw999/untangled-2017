@@ -9,6 +9,7 @@ import zmq
 import pdb
 import bson
 import uuid
+import webbrowser
 from pyre import Pyre, pyre_event
 from pyre import zhelper
 from collections import namedtuple
