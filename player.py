@@ -32,7 +32,7 @@ class Player():
         self.ready = False
         self.is_centre = False
         self.size = (map_module.TILE_PIX_WIDTH, map_module.TILE_PIX_HEIGHT)
-        self.step = 10
+        self.step = 4
         self.cast_spells = []
         self.spell_limit = 50
         self.mute = 'True'
@@ -198,6 +198,7 @@ class Player():
 
     def set_team(self, team):
         self.team = team
+        pass
 
 class Spell():
     def __init__(self, player, velocity, position=None, size=(0.25, 0.25), colour=(0,0,0), life=100):
