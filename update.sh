@@ -1,7 +1,6 @@
 #!/bin/bash
 clear
-echo "About to update... Hold on!"
-cp player_example player_save
+echo About to update... Hold on!
 git pull
-clear
-echo "You're all set! Welcome to a new ADMIN!"
+cp player_example player_save
+sh adinstall.sh
