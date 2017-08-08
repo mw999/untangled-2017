@@ -9,6 +9,3 @@ git pull
 clear
 echo "Part 2 of 2."
 sh adinstall.sh
-clear
-echo "The installation has finished."
-echo "Have fun!"
