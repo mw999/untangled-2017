@@ -278,10 +278,7 @@ class PlayerManager():
         # Set team for current player
         self_uuid = str(self.network.node.uuid())
 
-        if self_uuid in blue_team:
-            self.me.set_team("blue")
-        elif self_uuid in red_team:
-            self.me.set_team("red")
+        self.me.set_team("blue")
 
         # Set teams for other players
         for uuid, player in self.others.items():
