@@ -32,7 +32,7 @@ class Player():
         self.ready = False
         self.is_centre = False
         self.size = (map_module.TILE_PIX_WIDTH, map_module.TILE_PIX_HEIGHT)
-        self.step = 1
+        self.step = 10
         self.cast_spells = []
         self.spell_limit = 50
         self.mute = 'True'
