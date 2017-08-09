@@ -1,5 +1,6 @@
 import pygame
 import time
+import client
 
 from enum import Enum
 
@@ -15,7 +16,10 @@ class Screen():
             'large': pygame.font.Font(client.font, 75),
             'heading': pygame.font.Font(client.font, 95),
         }
-
+		
+        joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
+        for joystick in joysticks:
+            joystick.init()
 
     def render(self):
         return
@@ -167,8 +171,9 @@ class MainMenu(Screen):
                     elif(self.selected == 4):
                         #QUIT
                         return GameState.QUIT
-            if event.type == pygame.locals.JOYAXISMOTION:
-                if event.axis == 0:
+            if event.type == pygame.locals.JOYBUTTONDOWN:
+                
+                if joystick.get_button(client.buttons["A"]):
                     self.info_message = ''
 
                     if(self.selected == 0):
