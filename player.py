@@ -136,7 +136,7 @@ class Player():
         self.hudRender()
         
         font = pygame.font.Font(client.font, 30)
-        ver = font.render("ADMIN 0.5.1", False, (255,255,255))
+        ver = font.render("ADMIN 0.5.2", False, (255,255,255))
         rect = pygame.Surface((ver.get_width() + 15, 25), pygame.SRCALPHA, 32)
         rect.fill((0, 0, 0, 255))
         self.screen.blit(rect, (150,0))

@@ -1,6 +1,6 @@
 #!/bin/bash
 clear
-echo "You're all set! Welcome to ADMIN 0.5.1!"
+echo "You're all set! Welcome to ADMIN 0.5.2!"
 echo "Now for your name. What is it?"
 read name
 echo [Player] > player_save

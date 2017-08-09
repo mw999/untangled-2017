@@ -260,7 +260,7 @@ class GameClient():
                         last_update = pygame.time.get_ticks()
 
                     if cast == True:
-                        me.can_fire_ability = False
+                        me.can_fire_ability = True
                         me.firetime = time.time()                        
                     elif time.time() - me.firetime > 2:
                         me.can_fire_ability = True
