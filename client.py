@@ -37,8 +37,8 @@ player_animation_tileset_path = 'assets/tilesets/player.png'
 spell_image_path = 'assets/images/fireball.png'
 arrow_image_path = 'assets/images/arrow.png'
 
-buttons = {"A":1, "B":2, "X":0, "Y":3, "L":4, "R":5, "Start":9, "Select":8} #Use these for the PiHut SNES controller
-#buttons = {"A":0, "B":1, "X":2, "Y":3, "L":4, "R":5, "Start":7, "Select":6} #Use these for the iBuffalo SNES controller
+#buttons = {"A":1, "B":2, "X":0, "Y":3, "L":4, "R":5, "Start":9, "Select":8} #Use these for the PiHut SNES controller
+buttons = {"A":0, "B":1, "X":2, "Y":3, "L":4, "R":5, "Start":7, "Select":6} #Use these for the iBuffalo SNES controller
 
 error_message = "Everything is lava"
 
@@ -264,7 +264,6 @@ class GameClient():
                         me.firetime = time.time()                        
                     elif time.time() - me.firetime > 2:
                         me.can_fire_ability = True
-                          
                     if time.time() - me.steptime >30:
                         me.can_step_ability = True
                     elif time.time() - me.steptime >3:
@@ -273,6 +272,10 @@ class GameClient():
                     self.map.render()
                     me.render(True)
                     for flag in flags:
+                        possibleX = [flag.x, flag.x + 1]
+                        possibleY = [flag.y, flag.y + 1]
+                        if me.x in possibleX and me.y in possibleY:
+                            print("THE THING")
                         flag.render()
                     for spell in me.cast_spells:
                         spell.render()
