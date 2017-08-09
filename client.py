@@ -37,8 +37,8 @@ player_animation_tileset_path = 'assets/tilesets/player.png'
 spell_image_path = 'assets/images/fireball.png'
 arrow_image_path = 'assets/images/arrow.png'
 
-buttons = {"A":1, "B":2, "X":0, "Y":3, "L":4, "R":5, "Start":9, "Select":8} #Use these for the PiHut SNES controller
-#buttons = {"A":0, "B":1, "X":2, "Y":3, "L":4, "R":5, "Start":7, "Select":6} #Use these for the iBuffalo SNES controller
+#buttons = {"A":1, "B":2, "X":0, "Y":3, "L":4, "R":5, "Start":9, "Select":8} #Use these for the PiHut SNES controller
+buttons = {"A":0, "B":1, "X":2, "Y":3, "L":4, "R":5, "Start":7, "Select":6} #Use these for the iBuffalo SNES controller
 
 error_message = "Everything is lava"
 
@@ -175,8 +175,7 @@ class GameClient():
                                 toMove = True
                             elif event.key == pygame.locals.K_RETURN or event.key == pygame.locals.K_SPACE :
                                 if me.can_fire_ability:
-                                    cast = True
-                                    me.attack(Action.SPELL, last_direction, arrow_image_path)
+                                    cast = me.attack(Action.SPELL, last_direction, arrow_image_path)
 
                             if event.key == pygame.locals.K_r and me.can_step_ability:
                                 me.step = 2
@@ -191,8 +190,7 @@ class GameClient():
                             me.step = 1
                     if pygame.mouse.get_pressed()[0]:
                         if me.can_fire_ability:
-                            cast = True
-                            me.attack(Action.SPELL, last_direction, arrow_image_path)
+                            cast = me.attack(Action.SPELL, last_direction, arrow_image_path)
                         pygame.event.clear(pygame.locals.MOUSEBUTTONDOWN)  
 
 
@@ -246,8 +244,7 @@ class GameClient():
                         #Shoot
                         if joystick.get_button(buttons["R"]) or joystick.get_button(buttons["A"]):
                             if me.can_fire_ability:
-                                cast = True
-                                me.attack(Action.SPELL, last_direction, arrow_image_path)
+                                cast = me.attack(Action.SPELL, last_direction, arrow_image_path)
                         #Menu
                         if joystick.get_button(buttons["Start"]) or joystick.get_button(buttons["Select"]):
                             self.set_state(GameState.MENU)
@@ -337,13 +334,11 @@ class GameClient():
                     if self.players.others:
                         if toMove == True or cast == True:
                             self.network.node.shout("world:position", bson.dumps(me.get_position()._asdict()))
-                            toMove = False
                         if cast == True:
                             self.network.node.shout("world:combat", bson.dumps(me.cast_spells[-1].get_properties()._asdict()))
-                            cast = False
+                    toMove = False
+                    cast = False
 
-                    if cast == True:
-                        cast = False
                     for playerUUID, player in self.players.others.items():
                         try:
                             player.render()

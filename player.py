@@ -243,7 +243,7 @@ class Player():
         if action == Action.SPELL:
             if len(self.cast_spells) > self.spell_limit:
                 self.cast_spells[1:]
-            if self.mana > 5:
+            if self.mana >= 5:
                 self.depleatMana(5)
                 if direction == Movement.UP:
                     spell = Spell(self, (0, -0.25), image, position)
@@ -259,12 +259,17 @@ class Player():
                     self.cast_spells.append(spell)
                 else:
                     spell = Spell(self, direction, image, position)
-                    self.cast_spells.append(spell)
-            
-            
+                # Remove first element of list if limit reached.
+                if len(self.cast_spells) > self.spell_limit:
+                    self.cast_spells[1:]
+                self.cast_spells.append(spell)
+                return True
+            else:
+                return False
         elif action == Action.SWIPE:
             #TODO
-            return
+            return False
+        return False
 
     def remove_spell(self,spell):
         self.cast_spells.remove(spell)
