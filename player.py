@@ -132,6 +132,15 @@ class Player():
         self.screen.blit(health, (10,25))
 
     def render(self):
+        self.hudRender()
+        
+        font = pygame.font.Font(client.font, 30)
+        ver = font.render("ADMIN 0.4.7", False, (255,255,255))
+        rect = pygame.Surface((ver.get_width() + 15, 25), pygame.SRCALPHA, 32)
+        rect.fill((0, 0, 0, 255))
+        self.screen.blit(rect, (150,0))
+        self.screen.blit(ver, (157.5,0))
+        
         font = pygame.font.Font(client.font, 30)
 
         name_tag_colour = (255, 255, 255)
