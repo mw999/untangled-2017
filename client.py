@@ -35,6 +35,7 @@ font = 'assets/fonts/alterebro-pixel-font.ttf'
 level_tileset_path = 'assets/tilesets/main.png'
 player_animation_tileset_path = 'assets/tilesets/player.png'
 spell_image_path = 'assets/images/fireball.png'
+arrow_image_path = 'assets/images/arrow.png'
 
 buttons = {"A":1, "B":2, "X":0, "Y":3, "L":4, "R":5, "Start":9, "Select":8} #Use these for the PiHut SNES controller
 #buttons = {"A":0, "B":1, "X":2, "Y":3, "L":4, "R":5, "Start":7, "Select":6} #Use these for the iBuffalo SNES controller
@@ -84,7 +85,7 @@ class GameClient():
             pygame.locals.KEYDOWN, pygame.locals.MOUSEBUTTONDOWN,  pygame.locals.JOYBUTTONDOWN])
 
         self.levels = {
-            "main": SaveLevel('./assets/maps/CAPFLAG MAP')
+            "main": SaveLevel('./assets/maps/CAPFLAG MAP NAT')
         }
 
         self.map = Map(
@@ -94,7 +95,6 @@ class GameClient():
             LevelMusic('assets/music/song.mp3')
         )
         self.map.music.load_music()
-        self.spell_image = pygame.image.load(spell_image_path)
 
     def set_state(self, new_state):
         if(new_state and new_state != self.game_state):
@@ -114,7 +114,7 @@ class GameClient():
         cast = False # Flag for when player casts spell.
         me = self.players.me
         flags = self.flags
-
+        
         if me.mute == "False":
             LevelMusic.play_music_repeat()
 
@@ -122,6 +122,7 @@ class GameClient():
             while running:
                 self.screen.fill((white))
                 clock.tick(tickspeed)
+                
                 if(self.game_state.value == GameState.MENU.value):
                     self.menu.render((self.map.screen.get_width() * 0.45, self.map.screen.get_height()*0.4))
                     for event in pygame.event.get():
@@ -175,7 +176,7 @@ class GameClient():
                             elif event.key == pygame.locals.K_RETURN or event.key == pygame.locals.K_SPACE :
                                 if me.can_fire_ability:
                                     cast = True
-                                    me.attack(Action.SPELL, last_direction, self.spell_image)
+                                    me.attack(Action.SPELL, last_direction, arrow_image_path)
 
                             if event.key == pygame.locals.K_r and me.can_step_ability:
                                 me.step = 2
@@ -191,7 +192,7 @@ class GameClient():
                     if pygame.mouse.get_pressed()[0]:
                         if me.can_fire_ability:
                             cast = True
-                            me.attack(Action.SPELL, last_direction, self.spell_image)
+                            me.attack(Action.SPELL, last_direction, arrow_image_path)
                         pygame.event.clear(pygame.locals.MOUSEBUTTONDOWN)  
 
 
@@ -246,7 +247,7 @@ class GameClient():
                         if joystick.get_button(buttons["R"]) or joystick.get_button(buttons["A"]):
                             if me.can_fire_ability:
                                 cast = True
-                                me.attack(Action.SPELL, last_direction, self.spell_image)
+                                me.attack(Action.SPELL, last_direction, arrow_image_path)
                         #Menu
                         if joystick.get_button(buttons["Start"]) or joystick.get_button(buttons["Select"]):
                             self.set_state(GameState.MENU)
@@ -258,8 +259,8 @@ class GameClient():
 
                         last_update = pygame.time.get_ticks()
 
-                    if cast:
-                        me.can_fire_ability = True
+                    if cast == True:
+                        me.can_fire_ability = False
                         me.firetime = time.time()                        
                     elif time.time() - me.firetime > 2:
                         me.can_fire_ability = True
@@ -311,7 +312,7 @@ class GameClient():
                                 if event.group == "world:combat":
                                     new_spell_properties = bson.loads(event.msg[0])
                                     network_spell_caster = self.players.get(event.peer_uuid)
-                                    network_spell_caster.cast_spells.append(Spell(network_spell_caster, (0, 0), self.spell_image))
+                                    network_spell_caster.cast_spells.append(Spell(network_spell_caster, (0, 0), arrow_image_path))
                                     network_spell_caster.cast_spells[-1].set_properties(SpellProperties(**new_spell_properties))
                                 if event.group == "ctf:teams":
                                     if event.type == "SHOUT":
@@ -341,6 +342,8 @@ class GameClient():
                             self.network.node.shout("world:combat", bson.dumps(me.cast_spells[-1].get_properties()._asdict()))
                             cast = False
 
+                    if cast == True:
+                        cast = False
                     for playerUUID, player in self.players.others.items():
                         try:
                             player.render()
