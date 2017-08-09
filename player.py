@@ -30,7 +30,7 @@ class PlayerException(Exception):
     pass
 
 class Player():
-    def __init__(self, screen, map, network):
+    def __init__(self, screen, map, network, health=100, mana=100):
         self.hack = Hack(self, screen, map, network)
         self.screen = screen
         self.map = map
@@ -47,20 +47,28 @@ class Player():
         self.animation_ticker = 0
         self.network = network
 
+
         self.particle_list = []
         self.particle_limit = 500
 
         self.steptime = 0
         self.can_step_ability = True
+        
+        self.firetime = 0
+        self.can_fire_ability = True
 
         self.initial_position = map.level.get_place(Place.RED_SPAWN)
 
         self.set_position(self.initial_position)
 
         self.team = None
+        
+        self.health = health
+        self.mana = mana
+        self.maxMana = mana
 
     def __raiseNoPosition(self):
-        raise PlayerException({"message": "Player does not have a position set", "player": self})
+        raise PlayerException({"message": "Everything is lava: Player does not have a position set", "player": self})
 
 
     def save_to_config(self):
@@ -120,7 +128,17 @@ class Player():
         self.mute = mute
         if save: self.save_to_config()
 
-    def render(self):
+    def hudRender(self):
+        font = pygame.font.Font(client.font, 30)
+        mana = font.render("Mana: "+str(self.mana)+"/100", False, (255,255,255))
+        health = font.render("Health: "+str(self.health)+"/100", False, (255,255,255))
+        rect = pygame.Surface((health.get_width() + 15, 50), pygame.SRCALPHA, 32)
+        rect.fill((0,0,0, 255))
+        self.screen.blit(rect, (0,0))
+        self.screen.blit(mana, (10,0))
+        self.screen.blit(health, (10,25))
+
+    def render(self, isMe = False):
         self.hack.update(self)
         font = pygame.font.Font(client.font, 30)
 
@@ -148,17 +166,20 @@ class Player():
             centre[0] + ((self.size[0] - name_tag.get_width()) // 2),
             centre[1] - ((self.size[1] + name_tag.get_height()) // 2)
         )
-        
+
         self.screen.blit(name_tag, name_tag_pos)
 
         sprite = self.tileset.get_surface_by_id(self.animation_ticker)
         self.screen.blit(sprite, centre)
-        
+
         # create collision rectangle
         self.rect = sprite.get_rect()
         self.rect.topleft = centre
 
-        self.render_particles();
+        self.render_particles()
+        
+        if isMe:
+            self.hudRender()
 
     def render_particles(self):
         toRemove = []
@@ -182,7 +203,7 @@ class Player():
     def move(self, direction):
         if not self.ready:
             self.__raiseNoPosition()
-        
+
         c = (255,255,255)
         if self.team:
             if self.team == "blue":
@@ -221,23 +242,25 @@ class Player():
 
         return Position(self.x, self.y)
 
-    def attack(self, action, direction,position=None):
+    def attack(self, action, direction, image, position=None):
         if action == Action.SPELL:
-            if direction == Movement.UP:
-                spell = Spell(self, (0, -0.25),position)
-            elif direction == Movement.RIGHT:
-                spell = Spell(self, (0.25, 0),position)
-            elif direction == Movement.DOWN:
-                spell = Spell(self, (0, 0.25),position)
-            elif direction == Movement.LEFT:
-                spell = Spell(self, (-0.25, 0),position)
-            else:
-                spell = Spell(self, direction,position)
+            if self.mana > 5:
+                self.depleatMana(5)
+                if direction == Movement.UP:
+                    spell = Spell(self, (0, -0.25), image, position)
+                elif direction == Movement.RIGHT:
+                    spell = Spell(self, (0.25, 0), image, position)
+                elif direction == Movement.DOWN:
+                    spell = Spell(self, (0, 0.25), image, position)
+                elif direction == Movement.LEFT:
+                    spell = Spell(self, (-0.25, 0), image, position)
+                else:
+                    spell = Spell(self, direction, image, position)
 
-            # Remove first element of list if limit reached.
-            if len(self.cast_spells) > self.spell_limit:
-                self.cast_spells[1:]
-            self.cast_spells.append(spell)
+                # Remove first element of list if limit reached.
+                if len(self.cast_spells) > self.spell_limit:
+                    self.cast_spells[1:]
+                self.cast_spells.append(spell)
         elif action == Action.SWIPE:
             #TODO
             return
@@ -260,14 +283,29 @@ class Player():
             else:
                 newParticle["velocity"] = (random.randrange(-i,i)/(i*10),random.randrange(-i,i)/(i*10))
             self.particle_list.append(newParticle)
-        
+
     def remove_particle(self,particle):
         self.particle_list.remove(particle)
         return
+        
+    def depleatHealth(self, amount):
+        self.health -= amount
+        if self.health < 0:
+            self.die()
+            
+    def die(self): # Don't get confused with `def` and `death`!!! XD
+        pass
+    
+    def addMana(self, amount):
+        self.mana += amount
+    
+    def depleatMana(self, amount):
+        self.mana -= amount
 
 class Spell():
-    def __init__(self, player, velocity, position=None, size=(0.25, 0.25), colour=(0,0,0), life=100):
+    def __init__(self, player, velocity, image, position=None, size=(0.1, 0.1), colour=(0,0,0), life=100):
         self.player = player
+        self.image = image
         self.size = size
         self.colour = colour
         self.life = life
@@ -281,25 +319,37 @@ class Spell():
 
         self.set_velocity(velocity)
 
+        self.image = pygame.image.load(image)
+
     def render(self):
         self.colour = (random.randrange(255),random.randrange(255),random.randrange(255))
-        newSize = self.life/self.maxLife #random.randrange(100)/100
-        self.size = (newSize,newSize)
+        progress = self.life/self.maxLife #random.randrange(100)/100
+        newSize = (progress*self.size[0],progress*self.size[1])
         if(self.life <= 0):
             self.destroy()
 
         self.life -= 1
 
+        # Complicated mathmatical equations
+        image_size = self.image.get_size()
+        newImageSize = (
+            int(image_size[0]*newSize[0]),
+            int(image_size[1]*newSize[1])
+        )
+        # Look at all this math!
+        newRotation = round(math.atan2(self.velo_x,self.velo_y)*(180/math.pi)-180,4)
+
+
         pixel_pos = self.player.map.get_pixel_pos(self.x, self.y);
-        pixel_size = (
-            self.size[0] * map_module.TILE_PIX_WIDTH,
-            self.size[1] * map_module.TILE_PIX_HEIGHT
-        )
         offset_pos = (
-            pixel_pos[0] - (pixel_size[0]/2),
-            pixel_pos[1] - (pixel_size[1]/2)
+            pixel_pos[0] - (newImageSize[0]/2),
+            pixel_pos[1] - (newImageSize[1]/2)
         )
-        self.rect = pygame.draw.rect(self.player.screen, self.colour, Rect(offset_pos, pixel_size))
+
+        surf = pygame.transform.scale(self.image, newImageSize)
+        if newImageSize[0] != 0 and newImageSize[1] != 0:
+            surf = pygame.transform.rotate(surf, newRotation)
+        self.player.screen.blit(surf, offset_pos)
 
         # move the projectile by its velocity
         self.x += self.velo_x
@@ -325,10 +375,10 @@ class Spell():
     def set_velocity(self, velocity):
         self.velo_x, self.velo_y = velocity
 
-    def hit_target(self, target):
-        if self.rect.colliderect(target.rect):
-            # TODO - decide on what to do with collision
-            pass
+    # def hit_target(self, target):
+    #     if self.rect.colliderect(target.rect):
+    #         # TODO - decide on what to do with collision
+    #         pass
 
 class PlayerManager():
     def __init__(self, me, network):

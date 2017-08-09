@@ -2,6 +2,7 @@ import math
 import random
 import pygame
 import player as player_module
+import client as client_module
 
 class Hack():
     def __init__(self,player,screen,map,network):
@@ -11,7 +12,10 @@ class Hack():
         self.map = map
 
         self.noclip= False
-        self.inputCool = 0
+        self.count = 0
+        self.spinCount = 0
+
+        self.preKeys = pygame.key.get_pressed()
 
 
     def update(self,player):
@@ -25,21 +29,22 @@ class Hack():
             self.noclip = False
 
         #Shift Controls
-        if(keys[pygame.K_LSHIFT]):
+        if(keys[pygame.K_LSHIFT] and self.count%4 == 0):
             #Speed Modifier
-            if(self.inputCool == 0):
-                if keys[pygame.K_w]:
-                    player.step += 1
-                    self.inputCool = 4
-                    print("Speed set to:",player.step)
-                if keys[pygame.K_s]:
-                    player.step -= 1
-                    self.inputCool = 4
-                    print("Speed set to:",player.step)
-            else:
-                self.inputCool -= 1
+            if keys[pygame.K_q] and not self.preKeys[pygame.K_q]:
+                player.step += 1
+                print("Speed set to:",player.step)
+            if keys[pygame.K_e] and not self.preKeys[pygame.K_e]:
+                player.step -= 1
+                print("Speed set to:",player.step)
+            
+            self.preKeys = keys
 
             #Ring of death
             if(keys[pygame.K_SPACE]):
-                for i in range(0,30):
-                     player.attack(player_module.Action.SPELL,(math.sin(i),math.cos(i)),(player.x,player.y))
+                 velocity = (math.sin(self.spinCount),math.cos(self.spinCount))
+                 player.attack(player_module.Action.SPELL,velocity,client_module.arrow_image_path)
+                 self.spinCount += 0.6
+                 player.addMana(10)
+
+        self.count += 1
