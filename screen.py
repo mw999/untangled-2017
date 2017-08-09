@@ -155,8 +155,6 @@ class MainMenu(Screen):
                     self.currentLetter = 25
             elif event.button == 1:
                 self.char_name = self.char_name + self.letters[self.currentLetter]
-                if len(self.char_name) > name_character_limit:
-                    self.char_name = self.char_name[:10]
             elif event.button == 2:
                 self.char_name = self.char_name[:-1]
 
