@@ -29,7 +29,7 @@ class Action(Enum):
     FIRE = 1
     FROST = 2
     ICE = 3
-    LIGHTENING = 4
+    LIGHTNING = 4
     POISON = 5
 
 class PlayerException(Exception):
@@ -156,11 +156,11 @@ class Player():
 
     def render(self, isMe = False):
         font = pygame.font.Font(client.font, 30)
-        ver = font.render("ADMIN 0.6.1", False, (255,255,255))
+        ver = font.render("ADMIN 0.6.2", False, (255,255,255))
         rect = pygame.Surface((ver.get_width() + 15, 25), pygame.SRCALPHA, 32)
         rect.fill((0, 0, 0, 255))
-        self.screen.blit(rect, (200,0))
-        self.screen.blit(ver, (207.5,0))
+        self.screen.blit(rect, (300,0))
+        self.screen.blit(ver, (307.5,0))
         
         font = pygame.font.Font(client.font, 30)
 
