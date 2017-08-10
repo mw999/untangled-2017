@@ -50,7 +50,7 @@ class Hack():
             #Ring of death
             if(keys[pygame.K_SPACE]):
                  velocity = (math.sin(self.spinCount),math.cos(self.spinCount))
-                 self.client.cast = player.attack(player_module.Action(self.player.current_spell),velocity,client_module.projectile_paths[0])
+                 self.client.cast = player.attack(velocity,client_module.projectile_paths[player.current_spell])
                  self.spinCount += 0.6
                  player.addMana(10)
 
