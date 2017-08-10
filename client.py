@@ -52,6 +52,9 @@ buttons = {"A":0, "B":1, "X":2, "Y":3, "L":4, "R":5, "Start":7, "Select":6} #Use
 
 error_message = "Everything is lava"
 
+last_death_x = 0
+last_death_y = 0
+
 class GameState(Enum):
     MENU = 0
     PLAY = 1
@@ -81,8 +84,6 @@ class GameClient():
         self.menu = MainMenu(self.screen, self.players)
         
         self.last_death_image = pygame.image.load(player_dead)
-        self.last_death_x = 0
-        self.last_death_y = 0
 
     def setup_pygame(self):
         # Initialise screen/display
@@ -320,7 +321,7 @@ class GameClient():
                     for spell in me.cast_spells:
                         spell.render()
                     
-                    self.screen.blit(self.last_death_image, self.map.get_pixel_pos(self.last_death_x, self.last_death_y))
+                    self.screen.blit(self.last_death_image, self.map.get_pixel_pos(last_death_x, last_death_y))
                     
                     self.players.set(self.network.node.peers())
 
@@ -378,10 +379,6 @@ class GameClient():
                                                 "name": self.players.me.name
                                             }
                                         ))
-                                    elif event.group == "player:death":
-                                        last_death = bson.loads(event.msg[0])
-                                        self.last_death_x = last_death["x"]
-                                        self.last_death_y = last_death["y"]
                                 elif event.type == 'WHISPER':
                                     msg = bson.loads(event.msg[0])
                                     if self.players.authority_uuid == str(event.peer_uuid):
