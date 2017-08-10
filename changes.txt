@@ -1,0 +1,10 @@
+player.py
+
+from hack import *
+
+self.hack = Hack(self, screen, map, network)
+
+def render():
+    hack.update(self.player)
+
+while (self.map.level.can_move_to(self.x + tmp_x, self.y + tmp_y) or self.hack.noclip) and abs(tmp_x) <= self.step and abs(tmp_y) <= self.step:

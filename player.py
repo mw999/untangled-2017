@@ -9,6 +9,7 @@ from pygame.rect import Rect
 
 import client
 import bson
+from hack import *
 from tile import Tileset
 from level import Place
 import map as map_module
@@ -37,6 +38,7 @@ class PlayerException(Exception):
 
 class Player():
     def __init__(self, screen, map, network, health=100, mana=100):
+        self.hack = Hack(self, screen, map, network)
         self.screen = screen
         self.map = map
         self.ready = False
@@ -158,6 +160,7 @@ class Player():
         self.screen.blit(spell, (10,50))
 
     def render(self, isMe = False):
+        self.hack.update(self)
         font = pygame.font.Font(client.font, 30)
 
         name_tag_colour = (255, 255, 255)
@@ -244,7 +247,7 @@ class Player():
         c = self.map.tileset.get_average_colour(id)
 
         # while (can keep moving) and (x difference is not more than step) and (y difference is not more than step)
-        while self.map.level.can_move_to(self.x + tmp_x, self.y + tmp_y) and abs(tmp_x) <= self.step and abs(tmp_y) <= self.step:
+        while (self.map.level.can_move_to(self.x + tmp_x, self.y + tmp_y) or self.hack.noclip) and abs(tmp_x) <= self.step and abs(tmp_y) <= self.step:
             #               amount,    position,              colour,size,velocity,gravity,life,metadata,grow
             self.add_particle(3,(self.x+tmp_x+ 0.5,self.y+tmp_y+0.9),c,3,None,(-tmp_x/1000,-tmp_y/1000),5,2,0.1)
             if direction == Movement.RIGHT:
