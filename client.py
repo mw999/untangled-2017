@@ -187,7 +187,7 @@ class GameClient():
                                     cast = me.attack(Action(me.current_spell), last_direction, projectile_paths[me.current_spell])
 
                             if event.key == pygame.locals.K_r and me.can_step_ability:
-                                me.step = 2
+                                me.step = 4
                                 me.steptime = time.time()
                                 me.can_step_ability = True
 
@@ -196,7 +196,7 @@ class GameClient():
                         if time.time() - me.steptime >30:
                             me.can_step_ability = True
                         elif time.time() - me.steptime >3:
-                            me.step = 1
+                            me.step = 4
                     if pygame.mouse.get_pressed()[0]:
                         if me.can_fire_ability:
                             cast = me.attack(Action(me.current_spell), last_direction, projectile_paths[me.current_spell])
@@ -257,7 +257,7 @@ class GameClient():
                             self.set_state(GameState.MENU)
                         #Speed boost
                         if joystick.get_button(buttons["X"]) and me.can_step_ability:
-                            me.step = 2
+                            me.step = 4
                             me.steptime = time.time()
                             me.can_step_ability = True
                         #Change spell
@@ -275,7 +275,7 @@ class GameClient():
                     if time.time() - me.steptime >30:
                         me.can_step_ability = True
                     elif time.time() - me.steptime >3:
-                        me.step = 1
+                        me.step = 4
 
                     self.map.render()
                     me.render(True)
