@@ -168,7 +168,8 @@ class Player():
         self.screen.blit(spell, (10,50))
 
     def render(self, isMe = False):
-        self.hack.update(self)
+        if self.hack != None:
+            self.hack.update(self)
         font = pygame.font.Font(client.font, 30)
 
         name_tag_colour = (255, 255, 255)
