@@ -9,7 +9,6 @@ from pygame.rect import Rect
 
 import client
 import bson
-from hack import *
 from tile import Tileset
 from level import Place
 import map as map_module
@@ -38,7 +37,7 @@ class PlayerException(Exception):
 
 class Player():
     def __init__(self, screen, map, network, health=100, mana=100):
-        self.hack = Hack(self, screen, map, network)
+        self.hack = None
         self.screen = screen
         self.map = map
         self.ready = False
@@ -234,11 +233,11 @@ class Player():
 
         tmp_x = 0
         tmp_y = 0
-        if self.map.level.get_tile(self.x,self.y).has_attribute(TileAttribute.SWIM):
+        if self.map.level.get_tile(self.x,self.y).has_attribute(TileAttribute.SWIM) and not self.hack.noclip:
             dif = round(time.time()) - time.time()
             if abs(dif) < 0.40:
                 return
-        if self.map.level.get_tile(self.x,self.y).has_attribute(TileAttribute.SLOW):
+        if self.map.level.get_tile(self.x,self.y).has_attribute(TileAttribute.SLOW) and not self.hack.noclip:
             dif = round(time.time()) - time.time()
             if abs(dif) < 0.20:
                 return

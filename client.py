@@ -23,6 +23,7 @@ from screen import MainMenu
 from level import SaveLevel
 from tile import Tileset
 from music import LevelMusic
+from hack import *
 
 white = (255,255,255)
 black = (0,0,0)
@@ -64,6 +65,8 @@ class GameClient():
         self.network = Network()
         self.setup_pygame()
         me = Player(self.screen, self.map, self.network)
+        hack = Hack(self,me,self.screen,self.map,self.network)
+        me.hack = hack
         self.players = PlayerManager(me, self.network)
         self.flags = [Flag(self.screen, self.map, "red"), Flag(self.screen, self.map, "blue")]
         self.map.set_centre_player(self.players.me)
