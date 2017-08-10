@@ -38,12 +38,12 @@ red_flag = "assets/tilesets/Red Flag.png"
 blue_flag = "assets/tilesets/Blue Flag.png"
 
 projectile_paths = [
-                    'assets/images/arrow.png',
-                    'assets/images/fireball.png',
-                    'assets/images/frostbolt.png',
-                    'assets/images/icicle.png',
-                    'assets/images/lightning_bolt.png',
-                    'assets/images/poisonball.png'
+                    'assets/images/spells/arrow.png',
+                    'assets/images/spells/fireball.png',
+                    'assets/images/spells/frostbolt.png',
+                    'assets/images/spells/icicle.png',
+                    'assets/images/spells/lightning_bolt.png',
+                    'assets/images/spells/poisonball.png'
                     ]
 
 buttons = {"A":1, "B":2, "X":0, "Y":3, "L":4, "R":5, "Start":9, "Select":8} #Use these for the PiHut SNES controller
@@ -108,7 +108,7 @@ class GameClient():
             self.screen,
             self.levels.get("main"),
             Tileset(level_tileset_path, (16, 16), (32, 32)),
-            LevelMusic('assets/music/song.mp3')
+            LevelMusic('assets/music/mario.mp3')
         )
         self.map.music.load_music()
 
@@ -191,13 +191,13 @@ class GameClient():
                                 me.change_spell()
                             elif event.key == pygame.locals.K_RETURN or event.key == pygame.locals.K_SPACE :
                                 if me.can_fire_ability:
-                                    self.cast = me.attack(Action(me.current_spell), last_direction, projectile_paths[me.current_spell])
+                                    self.cast = me.attack(last_direction)
 
                             if event.key == pygame.locals.K_r and me.can_step_ability:
                                 me.step = 2
                                 me.steptime = time.time()
                                 me.can_step_ability = False
-                            
+
                             if event.key == pygame.locals.K_q:
                                 if me.can_switch_spell:
                                     me.change_spell()
@@ -205,11 +205,11 @@ class GameClient():
                                     me.can_switch_spell = False
 
                             pygame.event.clear(pygame.locals.KEYDOWN)
-                    
+
                     if event.type == pygame.locals.MOUSEBUTTONDOWN:
                         if event.button == 0:
                             if me.can_fire_ability:
-                                self.cast = me.attack(Action(me.current_spell), last_direction, projectile_paths[me.current_spell])
+                                self.cast = me.attack(last_direction)
                             pygame.event.clear(pygame.locals.MOUSEBUTTONDOWN)
                         if event.button == 4 or event.button == 5:
                             if me.can_switch_spell:
@@ -217,7 +217,7 @@ class GameClient():
                                 me.switch_time = time.time()
                                 me.can_switch_spell = False
                                 pygame.event.clear(pygame.locals.MOUSEBUTTONDOWN)
-                    
+
                     # https://stackoverflow.com/a/15596758/3954432
                     # Handle controller input by setting flags (move, neutral)
                     # and using timers (delay, pressed).
@@ -267,7 +267,7 @@ class GameClient():
                         #Shoot
                         if joystick.get_button(buttons["R"]) or joystick.get_button(buttons["A"]):
                             if me.can_fire_ability:
-                                self.cast = me.attack(Action(me.current_spell), last_direction, projectile_paths[me.current_spell])
+                                self.cast = me.attack(last_direction)
                         #Menu
                         if joystick.get_button(buttons["Start"]) or joystick.get_button(buttons["Select"]):
                             self.set_state(GameState.MENU)
@@ -295,15 +295,15 @@ class GameClient():
                         me.can_step_ability = True
                     elif time.time() - me.steptime >3:
                         me.step = 1
-                    
+
                     if time.time() - me.switch_time > 0.1:
                         me.can_switch_spell = True
-                    
+
                     if time.time() - me.swim_timer > 0.3:
                         me.can_swim = True
                     if time.time() - me.sand_timer > 0.1:
                         me.can_sand = True
-                    
+
                     self.map.render()
                     for flag in self.flags.values():
                         flag.render()
