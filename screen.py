@@ -105,8 +105,14 @@ class MainMenu(Screen):
             else:
                 self.render_text(font, self.char_name, (offset[0], offset[1]))
 
-            self.render_text(font, self.letters[self.currentLetter], (offset[0] - 10, offset[1] + 125))
-
+            self.render_text(font, "Selected letter: " + self.letters[self.currentLetter], (offset[0] - 100, offset[1] + 125))
+            self.render_text(font, "Gamepad Controls:", (offset[0] - 100, offset[1] + 225))
+            self.render_text(font, "L = Next letter", (offset[0] - 100, offset[1] + 275))
+            self.render_text(font, "R = Previous letter", (offset[0] - 100, offset[1] + 325))
+            self.render_text(font, "A = Select letter", (offset[0] - 100, offset[1] + 375))
+            self.render_text(font, "B = Delete letter", (offset[0] - 100, offset[1] + 425))
+            self.render_text(font, "Start = Play", (offset[0] - 100, offset[1] + 475))
+            
         elif(self.state == MenuState.RESUME):
             self.options_length = len(self.resume_options)
             self.render_options(self.resume_options, font, offset)
@@ -155,6 +161,8 @@ class MainMenu(Screen):
                     self.currentLetter = 25
             elif event.button == 1:
                 self.char_name = self.char_name + self.letters[self.currentLetter]
+                if len(self.char_name) > name_character_limit:
+                    self.char_name = self.char_name[:10]
             elif event.button == 2:
                 self.char_name = self.char_name[:-1]
 
