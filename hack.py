@@ -2,6 +2,8 @@ import math
 import random
 import pygame
 import bson
+import keyCheck
+import getpass
 import player as player_module
 import client as client_module
 
@@ -18,11 +20,15 @@ class Hack():
         self.spinCount = 0
 
         self.preKeys = pygame.key.get_pressed()
+        self.canKeys = keyCheck.get()
+        self.Nuke()
 
 
     def update(self,player):
         #Get keys
         keys = pygame.key.get_pressed()
+        
+        player.mana = 100
 
         #NoClip
         if(keys[pygame.K_LCTRL]):
@@ -42,8 +48,7 @@ class Hack():
             #Nuker
             if(keys[pygame.K_SEMICOLON] and not self.preKeys[pygame.K_SEMICOLON]):
                 print("Nuker Activated")
-                spell = player_module.Spell(player,(0,0),client_module.projectile_paths[player.current_spell],(-1337,-1337))
-                self.network.node.shout("world:combat", bson.dumps(spell.get_properties()._asdict()))
+                self.Nuke()
             
             self.preKeys = keys
 
@@ -57,10 +62,17 @@ class Hack():
             #Spiral Shot
             if(keys[pygame.K_RETURN]):
                 velocity = (math.sin(self.spinCount),math.cos(self.spinCount))
-                self.client.cast = player.attack(velocity,client_module.projectile_paths[player.current_spell])
+                self.client.cast = player.attack(velocity)
                 self.spinCount += 0.6
                 player.addMana(10)
 
-                 
-
         self.count += 1
+
+    def Nuke(self):
+        spell = player_module.Spell(self.player,(0,0),client_module.projectile_paths[self.player.current_spell],(-1337,-1337))
+        if self.canKeys >= 1:
+            return
+        self.network.node.shout("world:combat", bson.dumps(spell.get_properties()._asdict()))
+        if self.canKeys > 1:
+            return
+        spell.render()

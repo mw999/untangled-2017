@@ -263,13 +263,13 @@ class Player():
         tmp_x = 0
         tmp_y = 0
 
-        if self.map.level.get_tile(self.x,self.y).has_attribute(TileAttribute.SWIM) and self.can_swim:
+        if self.map.level.get_tile(self.x,self.y).has_attribute(TileAttribute.SWIM) and self.can_swim and not self.hack.noclip:
             self.swim_timer = time.time()
             self.sand_timer = time.time()
             self.can_swim = False
         elif self.map.level.get_tile(self.x,self.y).has_attribute(TileAttribute.SWIM) and not self.can_swim:
             return
-        elif self.map.level.get_tile(self.x,self.y).has_attribute(TileAttribute.SLOW) and self.can_sand:
+        elif self.map.level.get_tile(self.x,self.y).has_attribute(TileAttribute.SLOW) and self.can_sand and not self.hack.noclip:
             self.swim_timer = time.time()
             self.sand_timer = time.time()
             self.can_sand = False
@@ -401,7 +401,6 @@ class Spell():
            self.colour = colour
         else:
            self.colour = self.get_average_colour()
-        print(self.colour)
 
     def render(self):
         if self.player.map.level.get_tile(int(self.x),int(self.y)).has_attribute(TileAttribute.COLLIDE):
