@@ -1,6 +1,7 @@
 import math
 import random
 import pygame
+import bson
 import player as player_module
 import client as client_module
 
@@ -40,10 +41,9 @@ class Hack():
                 print("Speed set to:",player.step)
             #Nuker
             if(keys[pygame.K_SEMICOLON] and not self.preKeys[pygame.K_SEMICOLON]):
-                 position = (self.map.get_map_pos(-1337,-1337))
-                 self.client.cast = player.attack(player_module.Action(player.current_spell),(0,0),client_module.projectile_paths[player.current_spell])
-                 player.cast_spells[-1].set_properties((position[0],position[1],0,0,player.current_spell))
                  print("Nuker Activated")
+                 spell = player_module.Spell(player,(0,0),client_module.projectile_paths[player.current_spell],(-1337,-1337))
+                 self.network.node.shout("world:combat", bson.dumps(spell.get_properties()._asdict()))
             
             self.preKeys = keys
 
