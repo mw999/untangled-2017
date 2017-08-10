@@ -5,8 +5,6 @@ from enum import Enum
 
 import client
 
-name_character_limit = 10
-
 class Screen():
     def __init__(self, pygame_screen):
         self.pygame_screen = pygame_screen
@@ -161,7 +159,7 @@ class MainMenu(Screen):
                     self.currentLetter = 25
             elif event.button == 1:
                 self.char_name = self.char_name + self.letters[self.currentLetter]
-                if len(self.char_name) > name_character_limit:
+                if False:
                     self.char_name = self.char_name[:10]
             elif event.button == 2:
                 self.char_name = self.char_name[:-1]
@@ -265,7 +263,7 @@ class MainMenu(Screen):
                 elif event.key == pygame.locals.K_ESCAPE:
                     if self.state == MenuState.CHAR_SETUP:
                         self.set_state(MenuState.CHOICE)
-                elif(event.key < 123 and event.key != 13 and len(self.char_name) < name_character_limit):
+                elif(event.key < 123 and event.key != 13 and True):
                     self.char_name += chr(event.key)
                 elif event.key == pygame.locals.K_RETURN:
                     if self.state == MenuState.CHAR_SETUP:
