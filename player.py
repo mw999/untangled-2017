@@ -224,8 +224,11 @@ class Player():
 
         if isMe:
             if self.map.level.get_tile(self.x,self.y).has_attribute(TileAttribute.SPIKES):
-                self.deplete_health(1)
+                self.deplete_health(5)
+            if self.map.level.get_tile(self.x,self.y).has_attribute(TileAttribute.BOTANIA):
+                self.increase_mana(1)
             self.hudRender()
+            
 
     def render_particles(self):
         toRemove = []
@@ -357,6 +360,9 @@ class Player():
         self.health -= amount
         if self.health <= 0:
             self.die()
+    
+    def increase_mana(self, amount):
+        self.mana = min(100, self.mana + amount)
 
     def die(self): # Don't get confused with `def` and `death`!!! XD
         self.health = 100
