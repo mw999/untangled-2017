@@ -190,17 +190,26 @@ class GameClient():
                                 me.step = 4
                                 me.steptime = time.time()
                                 me.can_step_ability = True
+                                
+                                if event.key == pygame.locals.K_q:
+                                    if me.can_switch_spell:
+                                        me.change_spell()
+                                        me.switch_time = time.time()
+                                        me.can_switch_spell = False
 
                             pygame.event.clear(pygame.locals.KEYDOWN)
 
-                        if time.time() - me.steptime >30:
-                            me.can_step_ability = True
-                        elif time.time() - me.steptime >3:
-                            me.step = 4
-                    if pygame.mouse.get_pressed()[0]:
-                        if me.can_fire_ability:
-                            cast = me.attack(Action(me.current_spell), last_direction, projectile_paths[me.current_spell])
-                        pygame.event.clear(pygame.locals.MOUSEBUTTONDOWN)
+                        if event.type == pygame.locals.MOUSEBUTTONDOWN:
+                            if event.button == 0:
+                                if me.can_fire_ability:
+                                    cast = me.attack(Action(me.current_spell), last_direction, projectile_paths[me.current_spell])
+                                pygame.event.clear(pygame.locals.MOUSEBUTTONDOWN)
+                            if event.button == 4 or event.button == 5:
+                                if me.can_switch_spell:
+                                    me.change_spell()
+                                    me.switch_time = time.time()
+                                    me.can_switch_spell = False
+                                    pygame.event.clear(pygame.locals.MOUSEBUTTONDOWN)
 
                     # https://stackoverflow.com/a/15596758/3954432
                     # Handle controller input by setting flags (move, neutral)
@@ -261,8 +270,11 @@ class GameClient():
                             me.steptime = time.time()
                             me.can_step_ability = True
                         #Change spell
-                        if joystick.get_button(buttons["L"]) and me.can_step_ability:
-                            me.change_spell()
+                        if joystick.get_button(buttons["L"]):
+                            if me.can_switch_spell:
+                                me.change_spell()
+                                me.switch_time = time.time()
+                                me.can_switch_spell = False
 
                         last_update = pygame.time.get_ticks()
 
@@ -276,6 +288,9 @@ class GameClient():
                         me.can_step_ability = True
                     elif time.time() - me.steptime >3:
                         me.step = 4
+                        
+                    if time.time() - me.switch_time > 0.1:
+                        me.can_switch_spell = True
 
                     self.map.render()
                     me.render(True)
@@ -319,6 +334,7 @@ class GameClient():
                                 if event.group == "world:combat":
                                     new_spell_properties = bson.loads(event.msg[0])
                                     network_spell_caster = self.players.get(event.peer_uuid)
+                                    network_spell_caster.current_spell = new_spell_properties.get('current_spell')
                                     network_spell_caster.cast_spells.append(Spell(network_spell_caster, (0, 0), projectile_paths[network_spell_caster.current_spell]))
                                     network_spell_caster.cast_spells[-1].set_properties(SpellProperties(**new_spell_properties))
                                 if event.group == "ctf:teams":

@@ -22,7 +22,7 @@ class Movement(Enum):
     DOWN = 3
     LEFT = 4
 Position = namedtuple('Position', ['x', 'y'])
-SpellProperties = namedtuple('SpellProperties', ['x', 'y', 'x_velocity', 'y_velocity',])
+SpellProperties = namedtuple('SpellProperties', ['x', 'y', 'x_velocity', 'y_velocity', 'current_spell'])
 
 class Action(Enum):
     ARROW = 0
@@ -59,6 +59,9 @@ class Player():
 
         self.firetime = 0
         self.can_fire_ability = True
+        
+        self.switch_time = 0
+        self.can_switch_spell = True
 
         self.projSpeed = 1.5
         self.cast_spells = []
@@ -156,7 +159,7 @@ class Player():
 
     def render(self, isMe = False):
         font = pygame.font.Font(client.font, 30)
-        ver = font.render("ADMIN 0.6.3", False, (255,255,255))
+        ver = font.render("ADMIN 0.6.4", False, (255,255,255))
         rect = pygame.Surface((ver.get_width() + 15, 25), pygame.SRCALPHA, 32)
         rect.fill((0, 0, 0, 255))
         self.screen.blit(rect, (300,0))
@@ -332,9 +335,9 @@ class Player():
         pass
 
 class Spell():
-    def __init__(self, player, velocity, image, position=None, size=(0.1, 0.1), colour=(0,0,0), life=100, mana_cost = 5):
+    def __init__(self, player, velocity, image_path, position=None, size=(0.1, 0.1), colour=(0,0,0), life=100, mana_cost = 5):
         self.player = player
-        self.image = image
+        self.image_path = image_path
         self.size = size
         self.colour = colour
         self.life = life
@@ -350,7 +353,7 @@ class Spell():
         self.set_velocity(velocity)
 
         self.player.depleatMana(self.mana_cost)
-        self.image = pygame.image.load(image)
+        self.image = pygame.image.load(self.image_path)
 
     def render(self):
         self.colour = (random.randrange(255),random.randrange(255),random.randrange(255))
@@ -394,10 +397,10 @@ class Spell():
         del(self)
 
     def get_properties(self):
-        return SpellProperties(self.x, self.y, self.velo_x, self.velo_y)
+        return SpellProperties(self.x, self.y, self.velo_x, self.velo_y, self.player.current_spell)
 
     def set_properties(self, properties):
-        self.x, self.y, self.velo_x, self.velo_y = properties
+        self.x, self.y, self.velo_x, self.velo_y, self.player.current_spell = properties
 
     def set_position(self, position):
         self.x = position[0] + 0.5 - (self.size[0] / 2)
