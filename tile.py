@@ -17,7 +17,7 @@ class TileAttribute(Enum): #I don't actually know how this works, someone else n
 
 class TileType(Enum):
     #Remember to update Line 71 in level.py if you add or remove definitions here.
-    GRASS = ([53],  [])
+    GRASS = ([53],  [ TileAttribute.SPIKES ])
     DIRT = ([2], [])
     BIGTREE1 = ([156], [])
     BIGTREE2 = ([157], [])

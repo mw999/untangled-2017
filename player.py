@@ -85,6 +85,8 @@ class Player():
         self.sand_timer = 0
         self.can_swim = True
         self.can_sand = True
+        
+        self.last_death = self
 
     def __raiseNoPosition(self):
         raise PlayerException({"message": "Everything is lava: Player does not have a position set", "player": self})
@@ -348,6 +350,7 @@ class Player():
     def die(self): # Don't get confused with `def` and `death`!!! XD
         self.health = 100
         self.mana = 100
+        self.network.node.shout("player:death",  bson.dumps({'x': self.x, 'y': self.y}))
         self.network.node.whisper(UUID(self.network.authority_uuid), bson.dumps({'type': 'death_report'}))
 
     def addMana(self, amount):

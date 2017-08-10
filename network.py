@@ -15,6 +15,7 @@ class Network():
         self.node.join("ctf:gotflag")
         self.node.join("players:whois")
         self.node.join("player:name")
+        self.node.join("player:death")
 
         self.poller = zmq.Poller()
         self.poller.register(self.node.socket(), zmq.POLLIN)
