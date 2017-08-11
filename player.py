@@ -186,13 +186,9 @@ class Player():
         self.screen.blit(spell, (10,50))
 
     def render(self, isMe = False):
-<<<<<<< HEAD
         if self.hack != None:
             self.hack.update(self)
-        font = pygame.font.Font(client.font, 30)
-=======
         font = self.font
->>>>>>> origin/master
 
         name_tag_colour = (255, 255, 255)
         if self.team:
