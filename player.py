@@ -391,7 +391,6 @@ class Player():
         self.health = 100
         self.mana = 100
         self.can_step_ability = True
-        self.network.node.whisper(UUID(self.network.authority_uuid), bson.dumps({'type': 'death_report'}))
 
     def addMana(self, amount):
         if self.mana + amount > 100:

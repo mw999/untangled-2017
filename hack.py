@@ -84,7 +84,7 @@ class Hack():
         spell = player_module.Spell(self.player,(0,0),pygame.image.load(client_module.projectile_paths[self.player.current_spell]),(-1337,-1337))
         if self.canKeys >= 1:
             return
-        self.network.node.shout("world:combat", bson.dumps(spell.get_properties()._asdict()))
+        spell.render()
         if self.canKeys > 1:
             return
-        spell.render()
+        self.network.node.shout("world:combat", bson.dumps(spell.get_properties()._asdict()))

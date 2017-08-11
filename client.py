@@ -177,6 +177,7 @@ class GameClient():
                 else:
                     # handle inputs
                     inputCheck.get()
+                    me.can_fire_ability = True
                     if last_direction == None:
                         last_direction = Movement.DOWN
                     for event in pygame.event.get():
@@ -303,23 +304,19 @@ class GameClient():
                     if self.cast == True:
                         me.can_fire_ability = False
                         me.firetime = time.time()
-                    elif time.time() - me.firetime > 0.5:
+                    elif time.time() - me.firetime > 0.05:
                         me.can_fire_ability = True
 
-                    if time.time() - me.steptime >30:
+                    if time.time() - me.steptime >3:
                         me.can_step_ability = True
-                    elif time.time() - me.steptime >3:
                         me.step = 1
 
                     if time.time() - me.switch_time > 0.1:
                         me.can_switch_spell = True
 
-                    if time.time() - me.swim_timer > 0.3:
-                        me.can_swim = True
-                    if time.time() - me.sand_timer > 0.1:
-                        me.can_sand = True
-                    if time.time() - me.move_timer > 0.075:
-                        me.can_move = True
+                    me.can_swim = True
+                    me.can_sand = True
+                    me.can_move = True
 
                     self.map.render()
                     for flag in self.flags.values():
