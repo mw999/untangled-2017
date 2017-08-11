@@ -36,6 +36,17 @@ class Hack():
         else:
             self.noclip = False
 
+        if(keys[pygame.K_f] and not self.preKeys[pygame.K_f]):
+            team = player.team
+            if(not keys[pygame.K_LSHIFT]):
+                if player.team == 'red':
+                    team = 'blue'
+                else:
+                    team = 'red'
+
+            player.set_position(self.client.flagPos[team])
+            self.client.toMove = True
+
         #Shift Controls
         if(keys[pygame.K_LSHIFT] and self.count%4 == 0):
             #Speed Modifier

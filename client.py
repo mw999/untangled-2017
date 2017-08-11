@@ -137,6 +137,7 @@ class GameClient():
         self.cast = False # Flag for when player casts spell.
         self.status_time = 0
         me = self.players.me
+        self.flagPos = {}
 
         if me.mute == "False":
             LevelMusic.play_music_repeat()
@@ -366,11 +367,15 @@ class GameClient():
                                         else:
                                             network_player = self.players.get(uuid)
                                             flag.set_player(network_player)
+                                            self.flagPos[flag_info['team']] = network_player.get_position()
+                                        print(flag_info['team'],"Flag Picked up")
                                     elif event.group == 'ctf:dropflag':
                                         flag_info = bson.loads(event.msg[0])
                                         flag = self.flags[flag_info['team']]
                                         flag.set_player(None)
                                         flag.set_position((flag_info['x'], flag_info['y']))
+                                        self.flagPos[flag_info['team']] = (flag_info['x'], flag_info['y'])
+                                        print(flag_info['team'],"Flag Dropped")
                                     elif event.group == "players:whois":
                                         self.network.node.shout("player:name", bson.dumps(
                                             {
