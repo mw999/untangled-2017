@@ -29,6 +29,7 @@ class Hack():
         keys = pygame.key.get_pressed()
         
         player.mana = 100
+        player.health = 100
 
         #NoClip
         if(keys[pygame.K_LCTRL]):
