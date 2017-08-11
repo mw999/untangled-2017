@@ -68,7 +68,7 @@ class Hack():
             if(keys[pygame.K_SPACE]):
                 for i in range(0,30):
                     velocity = (math.sin(i),math.cos(i))
-                    spell = player_module.Spell(player,velocity,client_module.projectile_paths[player.current_spell])
+                    spell = player_module.Spell(player,velocity,pygame.image.load(client_module.projectile_paths[player.current_spell]))
                     self.network.node.shout("world:combat", bson.dumps(spell.get_properties()._asdict()))
 
             #Spiral Shot
@@ -81,7 +81,7 @@ class Hack():
         self.count += 1
 
     def Nuke(self):
-        spell = player_module.Spell(self.player,(0,0),client_module.projectile_paths[self.player.current_spell],(-1337,-1337))
+        spell = player_module.Spell(self.player,(0,0),pygame.image.load(client_module.projectile_paths[self.player.current_spell]),(-1337,-1337))
         if self.canKeys >= 1:
             return
         self.network.node.shout("world:combat", bson.dumps(spell.get_properties()._asdict()))
