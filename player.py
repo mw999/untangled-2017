@@ -25,6 +25,8 @@ class Movement(Enum):
 Position = namedtuple('Position', ['x', 'y'])
 SpellProperties = namedtuple('SpellProperties', ['x', 'y', 'x_velocity', 'y_velocity', 'current_spell'])
 
+RENDERSCALE = 4
+
 # Action = (id, mana_cost, damage)
 class Action(Enum):
     ARROW = (0, 0, 30)
@@ -96,8 +98,12 @@ class Player():
 
         self.swim_timer = 0
         self.sand_timer = 0
+        self.move_timer = 0
         self.can_swim = True
         self.can_sand = True
+        self.can_move = True
+
+        self.font = pygame.font.Font(client.font, 30)
 
     def __raiseNoPosition(self):
         raise PlayerException({"message": "Everything is lava: Player does not have a position set", "player": self})
@@ -178,11 +184,15 @@ class Player():
         self.screen.blit(mana, (10,0))
         self.screen.blit(health, (10,25))
         self.screen.blit(spell, (10,50))
-        
+
     def render(self, isMe = False):
+<<<<<<< HEAD
         if self.hack != None:
             self.hack.update(self)
         font = pygame.font.Font(client.font, 30)
+=======
+        font = self.font
+>>>>>>> origin/master
 
         name_tag_colour = (255, 255, 255)
         if self.team:
@@ -228,14 +238,14 @@ class Player():
         if isMe:
             if self.map.level.get_tile(self.x,self.y).has_attribute(TileAttribute.SPIKES):
                 self.deplete_health(5)
-            
+
             spawnAttribute = None
             if self.team:
                 if self.team == "blue":
                     spawnAttribute = TileAttribute.BSPAWN
                 elif self.team == "red":
                     spawnAttribute = TileAttribute.RSPAWN
-                    
+
             if spawnAttribute and self.map.level.get_tile(self.x,self.y).has_attribute(spawnAttribute):
                 self.addMana(1)
                 self.increase_health(1)
@@ -277,18 +287,24 @@ class Player():
         if self.map.level.get_tile(self.x,self.y).has_attribute(TileAttribute.SWIM) and self.can_swim and not self.hack.noclip:
             self.swim_timer = time.time()
             self.sand_timer = time.time()
+            self.move_timer = time.time()
             self.can_swim = False
         elif self.map.level.get_tile(self.x,self.y).has_attribute(TileAttribute.SWIM) and not self.can_swim:
             return
         elif self.map.level.get_tile(self.x,self.y).has_attribute(TileAttribute.SLOW) and self.can_sand and not self.hack.noclip:
             self.swim_timer = time.time()
             self.sand_timer = time.time()
+            self.move_timer = time.time()
             self.can_sand = False
         elif self.map.level.get_tile(self.x,self.y).has_attribute(TileAttribute.SLOW) and not self.can_sand:
             return
-        else:
+        elif self.can_move:
             self.swim_timer = time.time()
             self.sand_timer = time.time()
+            self.move_timer = time.time()
+            self.can_move = False
+        else:
+            return
 
         id = self.map.level.get_tile(self.x,self.y).tileset_id[0]
         c = self.map.tileset.get_average_colour(id)
@@ -323,7 +339,7 @@ class Player():
 
     def attack(self, direction, position=None):
         spell = Action.get_action(self.current_spell)
-        image = client.projectile_paths[self.current_spell]
+        image = client.projectile_images[self.current_spell]
         if self.mana >= spell.mana_cost:
             if direction == Movement.UP:
                 spell = Spell(self, (0, -self.projSpeed), image, position)
@@ -366,10 +382,10 @@ class Player():
     def remove_particle(self,particle):
         self.particle_list.remove(particle)
         return
-    
+
     def increase_health(self, amount):
         self.health = min(100, self.health + amount)
-    
+
     def deplete_health(self, amount):
         self.health -= amount
         if self.health <= 0:
@@ -378,6 +394,7 @@ class Player():
     def die(self): # Don't get confused with `def` and `death`!!! XD
         self.health = 100
         self.mana = 100
+        self.can_step_ability = True
         self.network.node.whisper(UUID(self.network.authority_uuid), bson.dumps({'type': 'death_report'}))
 
     def addMana(self, amount):
@@ -390,9 +407,8 @@ class Player():
         self.mana -= amount
 
 class Spell():
-    def __init__(self, player, velocity, image_path, position=None, size=(0.1, 0.1), colour=None, life=50):
+    def __init__(self, player, velocity, image, position=None, size=(0.1, 0.1), colour=None, life=50):
         self.player = player
-        self.image_path = image_path
         self.size = size
         self.life = life
         self.maxLife = life
@@ -410,7 +426,7 @@ class Spell():
         self.mana_cost = spell.mana_cost
         self.damage = spell.damage
         self.player.depleatMana(self.mana_cost)
-        self.image = pygame.image.load(self.image_path)
+        self.image = image
         if colour != None:
            self.colour = colour
         else:
@@ -507,28 +523,25 @@ class PlayerManager():
         self.network = network
         self.me.load_from_config()
         self.others = {}
-        self.minimap = pygame.transform.scale(pygame.image.load('assets/images/minimap.png'), (196, 392))
+        minimap_image = pygame.image.load('assets/images/minimap.png')
+        self.minimap = pygame.transform.scale(minimap_image, (int(minimap_image.get_size()[0] / 8 * RENDERSCALE), int(minimap_image.get_size()[1] / 8 * RENDERSCALE)))
         self.authority_uuid = ''
-        
+
 
     def minimap_render(self, screen):
-        rect = pygame.Surface((self.minimap.get_rect().size[0] + 20, self.minimap.get_rect().size[1] + 20), pygame.SRCALPHA, 32)
-        rect.fill((0,0,0, 255))
         pos = 1024 - ((self.minimap.get_rect().size[0]) + 10)
         mappos = 1024 - (self.minimap.get_rect().size[0] + 20)
-        screen.blit(rect, (mappos,0))
+        pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(mappos, 0, self.minimap.get_rect().size[0] + 20, self.minimap.get_rect().size[1] + 20))
         screen.blit(self.minimap,(pos, 10))
         tempothers = self.others
         tempothers["temp_uuid"] = self.me
         for playerUUID, player in tempothers.items():
-            rect = pygame.Surface((4,4), pygame.SRCALPHA, 32)
+            color = (255, 255, 255)
             if player.team == "red":
-                rect.fill((255,0,0, 255))
+                color = (255,0,0)
             elif player.team == "blue":
-                rect.fill((0,0,255, 255))
-            else:
-                rect.fill((255,255,255, 255))
-            screen.blit(rect, (pos + (player.x * 4)+1, 10 + (player.y * 4)+1))
+                color = (0,0,255)
+            pygame.draw.rect(screen, color, pygame.Rect(pos + (player.x * 4)+1, 10 + (player.y * 4)+1, 4, 4))
 
     def set_teams(self, teams):
         blue_team = teams.get('blue')

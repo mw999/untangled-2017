@@ -47,6 +47,10 @@ projectile_paths = [
                     'assets/images/spells/lightning_bolt.png',
                     'assets/images/spells/poisonball.png'
                     ]
+projectile_images = []
+
+for path in projectile_paths:
+    projectile_images.append(pygame.image.load(path))
 
 buttons = {"A":1, "B":2, "X":0, "Y":3, "L":4, "R":5, "Start":9, "Select":8} #Use these for the PiHut SNES controller
 #buttons = {"A":0, "B":1, "X":2, "Y":3, "L":4, "R":5, "Start":7, "Select":6} #Use these for the iBuffalo SNES controller
@@ -74,8 +78,8 @@ class GameClient():
 
         self.network.node.shout('players:whois', bson.dumps({}))
 
-        red = Sprite(self.screen, self.map, red_flag)
-        blue = Sprite(self.screen, self.map, blue_flag)
+        red = Sprite(self.screen, self.map, pygame.image.load(red_flag))
+        blue = Sprite(self.screen, self.map, pygame.image.load(blue_flag))
         self.flags = {
             'red': red,
             'blue': blue
@@ -89,7 +93,7 @@ class GameClient():
 
     def setup_pygame(self):
         # Initialise screen/display
-        self.screen = pygame.display.set_mode((width, height), pygame.HWSURFACE)
+        self.screen = pygame.display.set_mode((width, height), pygame.HWSURFACE | pygame.DOUBLEBUF)
 
         # Initialise fonts.
         pygame.font.init()
@@ -314,6 +318,8 @@ class GameClient():
                         me.can_swim = True
                     if time.time() - me.sand_timer > 0.1:
                         me.can_sand = True
+                    if time.time() - me.move_timer > 0.075:
+                        me.can_move = True
 
                     self.map.render()
                     for flag in self.flags.values():
@@ -354,7 +360,7 @@ class GameClient():
                                         new_spell_properties = bson.loads(event.msg[0])
                                         network_spell_caster = self.players.get(event.peer_uuid)
                                         network_spell_caster.current_spell = new_spell_properties.get('current_spell')
-                                        network_spell_caster.cast_spells.append(Spell(network_spell_caster, (0, 0), projectile_paths[network_spell_caster.current_spell]))
+                                        network_spell_caster.cast_spells.append(Spell(network_spell_caster, (0, 0), projectile_images[network_spell_caster.current_spell]))
                                         network_spell_caster.cast_spells[-1].set_properties(SpellProperties(**new_spell_properties))
                                     elif event.group == "ctf:teams":
                                         team_defs = bson.loads(event.msg[0])
@@ -414,11 +420,11 @@ class GameClient():
                         self.network.node.shout("world:combat", bson.dumps(me.cast_spells[-1].get_properties()._asdict()))
                         self.cast = False
 
-                    
+
                     for playerUUID, player in self.players.others.items():
                         try:
                             player.render()
-                            
+
                             for spell in player.cast_spells:
                                 spell.render()
                                 hit_me = spell.hit_target_player(me)
@@ -429,7 +435,7 @@ class GameClient():
                         except PlayerException as e:
                             # PlayerException due to no initial position being set for that player
                             pass
-                    
+
                     score_shift = 220
                     for team, score in self.scores.items():
                         colour = (0, 0, 200) if team == 'blue' else (200, 0, 0)
