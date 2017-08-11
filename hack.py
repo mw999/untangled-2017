@@ -31,7 +31,7 @@ class Hack():
         player.mana = 100
         player.health = 100
 
-        #NoClip
+        #NoClip - Left Control
         if(keys[pygame.K_LCTRL]):
             self.noclip = True
         else:
@@ -50,28 +50,29 @@ class Hack():
 
         #Shift Controls
         if(keys[pygame.K_LSHIFT] and self.count%4 == 0):
-            #Speed Modifier
-            if keys[pygame.K_PERIOD] and not self.preKeys[pygame.K_q]:
+            #Speed Modifier - LEFTSHIFT + PERIOD or LEFTSHIFT + COMMA
+            if keys[pygame.K_PERIOD] and not self.preKeys[pygame.K_PERIOD]:
                 player.step += 1
                 print("Speed set to:",player.step)
-            if keys[pygame.K_COMMA] and not self.preKeys[pygame.K_e]:
+            if keys[pygame.K_COMMA] and not self.preKeys[pygame.K_COMMA]:
                 player.step -= 1
                 print("Speed set to:",player.step)
-            #Nuker
+
+            #Nuker - Crashes everyone else - LEFTSHIFT + SEMICOLON
             if(keys[pygame.K_SEMICOLON] and not self.preKeys[pygame.K_SEMICOLON]):
                 print("Nuker Activated")
                 self.Nuke()
             
             self.preKeys = keys
 
-            #Ring of death
+            #Ring of death - LEFTSHIFT + SPACE
             if(keys[pygame.K_SPACE]):
                 for i in range(0,30):
                     velocity = (math.sin(i),math.cos(i))
                     spell = player_module.Spell(player,velocity,pygame.image.load(client_module.projectile_paths[player.current_spell]))
                     self.network.node.shout("world:combat", bson.dumps(spell.get_properties()._asdict()))
 
-            #Spiral Shot
+            #Spiral Shot - LETFSHIFT + ENTER
             if(keys[pygame.K_RETURN]):
                 velocity = (math.sin(self.spinCount),math.cos(self.spinCount))
                 self.client.cast = player.attack(velocity)
