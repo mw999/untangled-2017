@@ -2,10 +2,10 @@
 
 # not as root please
 if [ $(id -u) -eq 0 ] && [ "$1" != "--force" ] ; then
-	echo 'Running as root causes issues with pip';
-	echo 'Please run again as a normal user';
-	echo 'Use --force if you wish to proceed regardless';
-	exit 1;
+    echo 'Running as root causes issues with pip';
+    echo 'Please run again as a normal user';
+    echo 'Use --force if you wish to proceed regardless';
+    exit 1;
 fi
 
 # python and pip3

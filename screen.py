@@ -5,6 +5,9 @@ from enum import Enum
 
 import client
 
+name_character_min_limit = 1
+name_character_max_limit = 1000
+
 class Screen():
     def __init__(self, pygame_screen):
         self.pygame_screen = pygame_screen
@@ -40,6 +43,9 @@ class MainMenu(Screen):
         self.info_message = ''
         self.letters = "abcdefghijklmnopqrstuvwxyz"
         self.currentLetter = 0
+
+        self.logo = pygame.image.load('assets/images/logo.jpg')
+        self.logo = pygame.transform.scale(self.logo, (700, 200))
 
         self.main_options = {
             'Play': {
@@ -83,13 +89,11 @@ class MainMenu(Screen):
         font = self.fonts['large']
         info_font = self.fonts['small']
         header_font = self.fonts['heading']
-        logo = pygame.image.load('assets/images/logo.jpg')
-        logo = pygame.transform.scale(logo, (700, 200))
 
         self.ticker += 2
         self.ticker %= 100
 
-        self.pygame_screen.blit(logo,(offset[0] - 320, 220))
+        self.pygame_screen.blit(self.logo,(offset[0] - 320, 220))
         self.render_text(info_font, self.info_message, (offset[0] - 50, 375), (255, 100,100))
 
         if(self.state == MenuState.CHOICE):
@@ -110,7 +114,7 @@ class MainMenu(Screen):
             self.render_text(font, "A = Select letter", (offset[0] - 100, offset[1] + 375))
             self.render_text(font, "B = Delete letter", (offset[0] - 100, offset[1] + 425))
             self.render_text(font, "Start = Play", (offset[0] - 100, offset[1] + 475))
-            
+
         elif(self.state == MenuState.RESUME):
             self.options_length = len(self.resume_options)
             self.render_options(self.resume_options, font, offset)
@@ -149,19 +153,19 @@ class MainMenu(Screen):
                 self.selected += 1
                 self.selected %= self.options_length
         elif event.type == pygame.locals.JOYBUTTONDOWN:
-            if event.button == 5:
+            if event.button == client.buttons["R"]:
                 self.currentLetter += 1
                 if self.currentLetter == 26:
                     self.currentLetter = 0
-            elif event.button == 4:
+            elif event.button == client.buttons["L"]:
                 self.currentLetter -= 1
                 if self.currentLetter == -1:
                     self.currentLetter = 25
-            elif event.button == 1:
+            elif event.button == client.buttons["B"]:
                 self.char_name = self.char_name + self.letters[self.currentLetter]
-                if False:
-                    self.char_name = self.char_name[:10]
-            elif event.button == 2:
+                if len(self.char_name) > name_character_max_limit:
+                    self.char_name = self.char_name
+            elif event.button == client.buttons["X"]:
                 self.char_name = self.char_name[:-1]
 
         if(self.state == MenuState.CHOICE):
@@ -192,7 +196,7 @@ class MainMenu(Screen):
                         #QUIT
                         return GameState.QUIT
             if event.type == pygame.locals.JOYBUTTONDOWN:
-                if event.button == 1:
+                if event.button == client.buttons["A"]:
                     self.info_message = ''
 
                     if(self.selected == 0):
@@ -238,7 +242,8 @@ class MainMenu(Screen):
                         #QUIT
                         return GameState.QUIT
             if event.type == pygame.locals.JOYBUTTONDOWN:
-                if event.button == 1:
+
+                if event.button == client.buttons["B"]:
                     self.info_message = ''
 
                     if(self.selected == 0):
@@ -263,16 +268,16 @@ class MainMenu(Screen):
                 elif event.key == pygame.locals.K_ESCAPE:
                     if self.state == MenuState.CHAR_SETUP:
                         self.set_state(MenuState.CHOICE)
-                elif(event.key < 123 and event.key != 13 and True):
+                elif(event.key < 123 and event.key != 13 and len(self.char_name) < name_character_max_limit):
                     self.char_name += chr(event.key)
-                elif event.key == pygame.locals.K_RETURN:
+                elif event.key == pygame.locals.K_RETURN and len(self.char_name) > name_character_min_limit:
                     if self.state == MenuState.CHAR_SETUP:
                         self.setup_player()
                         self.set_state(MenuState.RESUME)
                         self.selected = 0
                         return GameState.PLAY
-            if event.type == pygame.locals.JOYBUTTONDOWN:
-                if event.button == 9:
+            if event.type == pygame.locals.JOYBUTTONDOWN and len(self.char_name) > name_character_min_limit:
+                if event.button == client.buttons["Start"]:
                     self.setup_player()
                     self.set_state(MenuState.RESUME)
                     self.selected = 0
