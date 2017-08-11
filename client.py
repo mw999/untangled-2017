@@ -10,6 +10,7 @@ import pdb
 import bson
 import uuid
 import webbrowser
+import keyCheck as inputCheck
 from pyre import Pyre, pyre_event
 from pyre import zhelper
 from collections import namedtuple
@@ -171,6 +172,7 @@ class GameClient():
                     self.game_state = GameState.MENU
                 else:
                     # handle inputs
+                    inputCheck.get()
                     if last_direction == None:
                         last_direction = Movement.DOWN
                     for event in pygame.event.get():
