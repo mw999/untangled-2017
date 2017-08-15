@@ -2,6 +2,8 @@
 
 A top-down capture the flag game for Untangled 2017.
 
+Event Blog Post: https://www.neontribe.co.uk/untangled-2017-2/
+
 ## Installation
 
 1. Clone the repository, and change into its directory.
