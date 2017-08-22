@@ -2,7 +2,9 @@
 
 A top-down capture the flag game for Untangled 2017.
 
-Event Blog Post: https://www.neontribe.co.uk/untangled-2017-2/
+Event Blog Posts: 
+* https://www.neontribe.co.uk/untangled-2017-2/
+* https://www.neontribe.co.uk/the-life-of-a-mentor-untangled-2017/
 
 ## Installation
 
